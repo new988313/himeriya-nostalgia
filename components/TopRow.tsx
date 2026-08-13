@@ -25,7 +25,7 @@ export default function TopRow() {
         <ListenerCount />
         <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-[11px] font-mono text-amber-300 backdrop-blur-md">
           <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-          98.3 FM HIMERIYA
+          23.7 FM HIMERIYA
         </span>
       </div>
 
