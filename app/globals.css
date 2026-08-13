@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette pulled from the dusk-lit cassette-corner brief: marigold shop
+     bulbs, terracotta signage, warm charcoal shadow. */
+  --color-accent: #e3a233;
+  --color-accent-2: #c7684a;
+  --color-ink: #17120d;
+  --color-paper: #f4ead9;
+
+  --font-display: "Iowan Old Style", "Georgia Pro", Georgia, "Noto Serif",
+    serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", monospace;
+
+  --animate-spin-slow: spin 8s linear infinite;
+  --animate-blink: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes eq1 {
+  0%, 100% { height: 3px; }
+  50% { height: 13px; }
+}
+@keyframes eq2 {
+  0%, 100% { height: 11px; }
+  50% { height: 4px; }
+}
+@keyframes eq3 {
+  0%, 100% { height: 5px; }
+  50% { height: 14px; }
+}
+@keyframes eq4 {
+  0%, 100% { height: 13px; }
+  50% { height: 3px; }
+}
+
+.animate-equalizer-1 { animation: eq1 0.7s ease-in-out infinite; }
+.animate-equalizer-2 { animation: eq2 0.5s ease-in-out infinite; }
+.animate-equalizer-3 { animation: eq3 0.8s ease-in-out infinite; }
+.animate-equalizer-4 { animation: eq4 0.6s ease-in-out infinite; }
+
+html,
+body {
+  height: 100%;
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-body);
+}
+
+/* --- Hero background: swaps art directions on orientation, not just a crop --- */
+.hero-bg {
+  background-image: url("/bg/scene-wide.png");
+  background-position: center center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+@media (orientation: portrait) {
+  .hero-bg {
+    background-image: url("/bg/scene-tall.png");
+    background-position: center center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+}
+
+/* --- Film grain: inline feTurbulence, no network request, no asset to cache --- */
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+}
+
+/* --- Safe-area corners, used by the fixed top row and the player --- */
+.safe-t {
+  top: max(1rem, env(safe-area-inset-top));
+}
+.safe-b {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.safe-l {
+  left: max(1rem, env(safe-area-inset-left));
+}
+.safe-r {
+  right: max(1rem, env(safe-area-inset-right));
+}
+/* For the bottom-anchored player, which sits in normal flow (not fixed) */
+.safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* --- Seek bar knob: only drawn on hover/active, per spec --- */
+.seek-knob {
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.seek-track:hover .seek-knob,
+.seek-track:active .seek-knob,
+.seek-track:focus-visible .seek-knob {
+  opacity: 1;
+}
+
+/* --- Vinyl artwork slot: the real YouTube iframe is oversized and centered
+   so the circular overflow-hidden mask "covers" it, instead of squashing a
+   16:9 video into a square. --- */
+.vinyl-frame {
+  position: relative;
+  overflow: hidden;
+}
+.vinyl-frame iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 169px;
+  transform: translate(-50%, -50%);
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow {
+    animation: none;
+  }
+}

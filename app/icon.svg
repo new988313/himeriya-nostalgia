@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="vinyl-base" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#262626"/>
+      <stop offset="60%" stop-color="#141414"/>
+      <stop offset="100%" stop-color="#090909"/>
+    </radialGradient>
+    <linearGradient id="label-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="wave-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Vinyl Outer Disc -->
+  <circle cx="32" cy="32" r="30" fill="url(#vinyl-base)" stroke="#333333" stroke-width="1.5"/>
+
+  <!-- Concentric Grooves -->
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1"/>
+  <circle cx="32" cy="32" r="18" fill="none" stroke="#ffffff" stroke-opacity="0.09" stroke-width="1"/>
+  <circle cx="32" cy="32" r="14" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+
+  <!-- Golden Center Record Label -->
+  <circle cx="32" cy="32" r="11" fill="url(#label-gold)" stroke="#fef3c7" stroke-opacity="0.4" stroke-width="1"/>
+
+  <!-- Center Spindle Hole -->
+  <circle cx="32" cy="32" r="3.5" fill="#090909" stroke="#ffffff" stroke-opacity="0.8" stroke-width="0.8"/>
+
+  <!-- Soundwave Arc overlay -->
+  <path d="M 12 32 A 20 20 0 0 1 20 18" fill="none" stroke="url(#wave-glow)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <path d="M 52 32 A 20 20 0 0 1 44 46" fill="none" stroke="url(#wave-glow)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+</svg>
