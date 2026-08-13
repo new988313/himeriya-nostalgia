@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useTheme } from "./ThemeProvider";
 
 type SeekBarProps = {
   currentTime: number;
@@ -12,6 +13,8 @@ type SeekBarProps = {
 export default function SeekBar({ currentTime, duration, onSeek, className = "" }: SeekBarProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragRatio, setDragRatio] = useState<number | null>(null);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   const ratioFromEvent = useCallback((clientX: number) => {
     const el = trackRef.current;
@@ -22,8 +25,6 @@ export default function SeekBar({ currentTime, duration, onSeek, className = "" 
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      // Pointer events (not click) so this also works for touch drags without
-      // the browser trying to scroll the page underneath the thumb.
       e.currentTarget.setPointerCapture(e.pointerId);
       const ratio = ratioFromEvent(e.clientX);
       setDragRatio(ratio);
@@ -68,13 +69,15 @@ export default function SeekBar({ currentTime, duration, onSeek, className = "" 
         if (e.key === "ArrowLeft") onSeek(Math.max(0, currentTime - 5));
       }}
     >
-      <div className="relative h-[3px] w-full overflow-visible rounded-full bg-white/15">
+      <div className={`relative h-[4px] w-full overflow-visible rounded-full ${isLight ? "bg-neutral-300" : "bg-white/15"}`}>
         <div
-          className="h-full rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_1px_rgba(227,162,51,0.55)]"
+          className="h-full rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_1px_rgba(227,162,51,0.65)]"
           style={{ width: `${liveRatio * 100}%` }}
         />
         <div
-          className="seek-knob absolute top-1/2 h-3 w-3 -translate-y-1/2 -translate-x-1/2 rounded-full bg-[var(--color-accent)] ring-2 ring-white/70"
+          className={`seek-knob absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 -translate-x-1/2 rounded-full bg-[var(--color-accent)] ring-2 ${
+            isLight ? "ring-neutral-800" : "ring-white/80"
+          }`}
           style={{ left: `${liveRatio * 100}%` }}
         />
       </div>

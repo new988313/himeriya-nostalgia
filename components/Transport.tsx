@@ -1,3 +1,7 @@
+"use client";
+
+import { useTheme } from "./ThemeProvider";
+
 type TransportProps = {
   isPlaying: boolean;
   onPrev: () => void;
@@ -59,6 +63,9 @@ export default function Transport({
   playButtonSize = 40,
   className = "",
 }: TransportProps) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       {onToggleShuffle && (
@@ -69,7 +76,11 @@ export default function Transport({
           title={isShuffle ? "Shuffle Mode: ON (S)" : "Shuffle Mode: OFF (S)"}
           className={`flex h-8 w-8 items-center justify-center rounded-full border transition active:scale-95 ${
             isShuffle
-              ? "border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)]"
+              ? isLight
+                ? "border-amber-600 bg-amber-500/30 text-amber-950 font-bold shadow-sm"
+                : "border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)]"
+              : isLight
+              ? "border-amber-900/20 bg-amber-900/10 text-amber-900/60 hover:text-amber-950 hover:bg-amber-900/20"
               : "border-white/10 bg-white/5 text-white/40 hover:text-white/80 hover:bg-white/10"
           }`}
         >
@@ -81,7 +92,9 @@ export default function Transport({
         type="button"
         onClick={onPrev}
         aria-label="Previous track"
-        className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition hover:text-white active:scale-95"
+        className={`flex h-10 w-10 items-center justify-center rounded-full transition active:scale-95 ${
+          isLight ? "text-amber-950/80 hover:text-amber-950" : "text-white/80 hover:text-white"
+        }`}
       >
         <PrevIcon />
       </button>
@@ -100,7 +113,9 @@ export default function Transport({
         type="button"
         onClick={onNext}
         aria-label="Next track"
-        className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition hover:text-white active:scale-95"
+        className={`flex h-10 w-10 items-center justify-center rounded-full transition active:scale-95 ${
+          isLight ? "text-amber-950/80 hover:text-amber-950" : "text-white/80 hover:text-white"
+        }`}
       >
         <NextIcon />
       </button>

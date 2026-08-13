@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { Playlist, Track } from "@/lib/youtube-types";
 import { formatTime } from "@/lib/format";
+import { useTheme } from "./ThemeProvider";
 
 type TrackDrawerProps = {
   isOpen: boolean;
@@ -21,6 +22,8 @@ export default function TrackDrawer({
 }: TrackDrawerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<number | "all">("all");
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   const allTracksWithMeta = useMemo(() => {
     const list: Array<{ track: Track; playlistIndex: number; trackIndex: number; playlistName: string }> = [];
@@ -53,24 +56,42 @@ export default function TrackDrawer({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 bg-black/70 backdrop-blur-md transition-opacity">
-      <div className="flex h-[85vh] sm:h-[650px] w-full max-w-2xl flex-col rounded-t-3xl sm:rounded-3xl border border-white/15 bg-neutral-950/90 p-5 text-white shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-6 duration-200">
+    <div
+      className={`fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 backdrop-blur-md transition-opacity ${
+        isLight ? "bg-amber-950/40" : "bg-black/70"
+      }`}
+    >
+      <div
+        className={`flex h-[85vh] sm:h-[650px] w-full max-w-2xl flex-col rounded-t-3xl sm:rounded-3xl border p-5 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-6 duration-200 ${
+          isLight
+            ? "border-amber-900/20 bg-amber-50/95 text-amber-950"
+            : "border-white/15 bg-neutral-950/90 text-white"
+        }`}
+      >
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+        <div className={`flex items-center justify-between pb-4 border-b ${isLight ? "border-amber-900/15" : "border-white/10"}`}>
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className={`text-lg font-bold flex items-center gap-2 ${isLight ? "text-amber-950" : "text-white"}`}>
               <span>Himeriya Song Library</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">
+              <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
+                isLight ? "bg-amber-900/15 text-amber-900 font-semibold" : "bg-amber-500/20 text-amber-300"
+              }`}>
                 110 Tracks
               </span>
             </h2>
-            <p className="text-xs text-white/60">Rights-cleared Bollywood classics & nostalgia hits</p>
+            <p className={`text-xs ${isLight ? "text-amber-900/70" : "text-white/60"}`}>
+              Rights-cleared Bollywood classics & nostalgia hits
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close track library"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/15 active:scale-95 transition-all text-white/70 hover:text-white"
+            className={`flex h-8 w-8 items-center justify-center rounded-full border active:scale-95 transition-all ${
+              isLight
+                ? "border-amber-900/20 bg-amber-900/10 text-amber-950 hover:bg-amber-900/20"
+                : "border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white"
+            }`}
           >
             ✕
           </button>
@@ -78,7 +99,12 @@ export default function TrackDrawer({
 
         {/* Search Bar */}
         <div className="relative my-4">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className={`absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 ${isLight ? "text-amber-900/50" : "text-white/40"}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -86,13 +112,19 @@ export default function TrackDrawer({
             placeholder="Search song title, artist, or film..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pl-10 pr-4 text-sm text-white placeholder-white/40 focus:border-amber-500/60 focus:bg-white/10 focus:outline-none transition-all"
+            className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm transition-all focus:outline-none ${
+              isLight
+                ? "border-amber-900/20 bg-white/80 text-amber-950 placeholder-amber-900/40 focus:border-amber-600 focus:bg-white"
+                : "border-white/10 bg-white/5 text-white placeholder-white/40 focus:border-amber-500/60 focus:bg-white/10"
+            }`}
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/50 hover:text-white"
+              className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${
+                isLight ? "text-amber-900/60 hover:text-amber-950" : "text-white/50 hover:text-white"
+              }`}
             >
               Clear
             </button>
@@ -106,7 +138,11 @@ export default function TrackDrawer({
             onClick={() => setActiveTab("all")}
             className={`px-3 py-1.5 rounded-lg border whitespace-nowrap transition-all ${
               activeTab === "all"
-                ? "border-amber-500 bg-amber-500/20 text-amber-300"
+                ? isLight
+                  ? "border-amber-600 bg-amber-500/30 text-amber-950 font-bold"
+                  : "border-amber-500 bg-amber-500/20 text-amber-300"
+                : isLight
+                ? "border-amber-900/15 bg-white/60 text-amber-950/70 hover:bg-white/90"
                 : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
             }`}
           >
@@ -119,7 +155,11 @@ export default function TrackDrawer({
               onClick={() => setActiveTab(idx)}
               className={`px-3 py-1.5 rounded-lg border whitespace-nowrap transition-all ${
                 activeTab === idx
-                  ? "border-amber-500 bg-amber-500/20 text-amber-300"
+                  ? isLight
+                    ? "border-amber-600 bg-amber-500/30 text-amber-950 font-bold"
+                    : "border-amber-500 bg-amber-500/20 text-amber-300"
+                  : isLight
+                  ? "border-amber-900/15 bg-white/60 text-amber-950/70 hover:bg-white/90"
                   : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
@@ -131,7 +171,7 @@ export default function TrackDrawer({
         {/* Track List */}
         <div className="flex-1 overflow-y-auto pr-1 space-y-1.5 mt-1">
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-sm text-white/40">
+            <div className={`py-12 text-center text-sm ${isLight ? "text-amber-900/50" : "text-white/40"}`}>
               No tracks found matching "{searchQuery}".
             </div>
           ) : (
@@ -147,7 +187,11 @@ export default function TrackDrawer({
                   }}
                   className={`w-full text-left flex items-center justify-between p-3 rounded-xl border transition-all ${
                     isCurrent
-                      ? "border-amber-500/80 bg-amber-500/15 text-amber-200 shadow-md"
+                      ? isLight
+                        ? "border-amber-600 bg-amber-200/60 text-amber-950 font-medium shadow-sm"
+                        : "border-amber-500/80 bg-amber-500/15 text-amber-200 shadow-md"
+                      : isLight
+                      ? "border-amber-900/10 bg-white/50 hover:bg-white/90 text-amber-950"
                       : "border-white/5 bg-white/[0.03] hover:bg-white/[0.08] text-white/90"
                   }`}
                 >
@@ -155,16 +199,16 @@ export default function TrackDrawer({
                     <div className="flex items-center gap-2">
                       <span className="truncate text-sm font-semibold">{track.title}</span>
                       {isCurrent && (
-                        <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+                        <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping" />
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-white/60 mt-0.5 truncate">
+                    <div className={`flex items-center gap-2 text-xs mt-0.5 truncate ${isLight ? "text-amber-900/70" : "text-white/60"}`}>
                       <span className="truncate">{track.artist}</span>
-                      {track.film && <span className="text-amber-400/80">• {track.film}</span>}
-                      {track.year && <span className="text-white/40">({track.year})</span>}
+                      {track.film && <span className={isLight ? "text-amber-800 font-medium" : "text-amber-400/80"}>• {track.film}</span>}
+                      {track.year && <span className={isLight ? "text-amber-900/50" : "text-white/40"}>({track.year})</span>}
                     </div>
                   </div>
-                  <div className="text-xs font-mono text-white/50 shrink-0">
+                  <div className={`text-xs font-mono shrink-0 ${isLight ? "text-amber-900/60" : "text-white/50"}`}>
                     {formatTime(track.duration)}
                   </div>
                 </button>

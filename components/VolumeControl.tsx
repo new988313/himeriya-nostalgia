@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTheme } from "./ThemeProvider";
 
 type VolumeControlProps = {
   volume: number;
@@ -16,6 +17,8 @@ export default function VolumeControl({
   onToggleMute,
 }: VolumeControlProps) {
   const [showSlider, setShowSlider] = useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   const displayVolume = isMuted ? 0 : volume;
 
@@ -27,14 +30,20 @@ export default function VolumeControl({
     >
       {/* Popover Volume Slider */}
       <div
-        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 flex flex-col items-center gap-2 rounded-xl border border-white/15 bg-neutral-900/90 p-2.5 backdrop-blur-xl shadow-2xl transition-all duration-200 ${
+        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 flex flex-col items-center gap-2 rounded-xl border p-2.5 backdrop-blur-xl shadow-2xl transition-all duration-200 ${
+          isLight
+            ? "border-amber-900/20 bg-amber-50/95 text-amber-950"
+            : "border-white/15 bg-neutral-900/90 text-white"
+        } ${
           showSlider ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"
         }`}
       >
-        <span className="text-[10px] font-mono text-white/80">{displayVolume}%</span>
-        <div className="relative h-24 w-1.5 rounded-full bg-white/10 flex items-end">
+        <span className={`text-[10px] font-mono ${isLight ? "text-amber-950 font-semibold" : "text-white/80"}`}>
+          {displayVolume}%
+        </span>
+        <div className={`relative h-24 w-1.5 rounded-full flex items-end ${isLight ? "bg-amber-900/15" : "bg-white/10"}`}>
           <div
-            className="w-full rounded-full bg-gradient-to-t from-amber-500 to-yellow-300"
+            className="w-full rounded-full bg-gradient-to-t from-amber-500 to-yellow-400"
             style={{ height: `${displayVolume}%` }}
           />
           <input
@@ -55,7 +64,11 @@ export default function VolumeControl({
         onClick={onToggleMute}
         aria-label={isMuted ? "Unmute audio" : "Mute audio"}
         title={isMuted ? "Unmute (M)" : `Volume ${volume}% (M)`}
-        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-all hover:bg-white/15 hover:text-white hover:border-white/25 active:scale-95"
+        className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all active:scale-95 ${
+          isLight
+            ? "border-amber-900/20 bg-amber-900/10 text-amber-950 hover:bg-amber-900/20"
+            : "border-white/10 bg-white/5 text-white/80 hover:bg-white/15 hover:text-white"
+        }`}
       >
         {isMuted || volume === 0 ? (
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

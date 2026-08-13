@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const BASE_LISTENERS = 0;
+import { useTheme } from "./ThemeProvider";
 
 export default function ListenerCount() {
   const [count, setCount] = useState<number>(1);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Generate unique session ID for this browser tab/device
     let sessionId = sessionStorage.getItem("himeriya_session_id");
     if (!sessionId) {
       sessionId = "sess_" + Math.random().toString(36).substring(2, 11);
@@ -31,11 +31,10 @@ export default function ListenerCount() {
           }
         }
       } catch {
-        // Fallback to offline estimate if network fails
+        // Fallback to offline estimate
       }
     };
 
-    // Immediate initial heartbeat
     sendHeartbeat();
 
     const handleLeave = () => {
@@ -56,7 +55,6 @@ export default function ListenerCount() {
     window.addEventListener("beforeunload", handleLeave);
     window.addEventListener("pagehide", handleLeave);
 
-    // Heartbeat pulse every 2.5 seconds for instant real-time synchronization
     const intervalId = window.setInterval(sendHeartbeat, 2500);
 
     return () => {
@@ -68,13 +66,21 @@ export default function ListenerCount() {
   }, []);
 
   return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-white/80 backdrop-blur-md shadow-sm shrink-0">
+    <div
+      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border backdrop-blur-md shadow-md shrink-0 transition-colors ${
+        isLight
+          ? "border-white/40 bg-white/90 text-neutral-900"
+          : "border-white/10 bg-white/5 text-white/80"
+      }`}
+    >
       <span className="relative flex h-1.5 w-1.5">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-accent)] opacity-60" />
         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
       </span>
-      <span className="tabular-nums font-mono text-amber-300">{count.toLocaleString("en-IN")}</span>
-      <span className="text-white/60 text-[11px]">live tuned in</span>
+      <span className={`tabular-nums font-mono ${isLight ? "text-amber-800 font-bold" : "text-amber-300"}`}>
+        {count.toLocaleString("en-IN")}
+      </span>
+      <span className={`text-[11px] ${isLight ? "text-neutral-700 font-medium" : "text-white/60"}`}>live tuned in</span>
     </div>
   );
 }

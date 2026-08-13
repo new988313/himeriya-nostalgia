@@ -4,9 +4,13 @@ import { useState } from "react";
 import Clock from "./Clock";
 import ListenerCount from "./ListenerCount";
 import SocialLinks from "./SocialLinks";
+import ThemeToggle from "./ThemeToggle";
+import { useTheme } from "./ThemeProvider";
 
 export default function TopRow() {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -23,18 +27,29 @@ export default function TopRow() {
       <div className="flex flex-1 items-center gap-2.5 sm:gap-3 pointer-events-auto">
         <Clock />
         <ListenerCount />
-        <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-[11px] font-mono text-amber-300 backdrop-blur-md">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+        <span
+          className={`hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-mono backdrop-blur-md transition-colors shadow-md ${
+            isLight
+              ? "border-amber-500/50 bg-white/90 text-amber-900 font-bold"
+              : "border-amber-500/30 bg-amber-500/10 text-amber-300"
+          }`}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
           23.7 FM HIMERIYA
         </span>
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-3 pointer-events-auto">
+      <div className="flex flex-1 items-center justify-end gap-2.5 sm:gap-3 pointer-events-auto">
         <SocialLinks />
+        <ThemeToggle />
         <button
           type="button"
           onClick={toggleFullscreen}
-          className="hidden sm:flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white backdrop-blur-md transition-all active:scale-95"
+          className={`hidden sm:flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-95 shadow-md ${
+            isLight
+              ? "border-white/40 bg-white/90 text-neutral-900 hover:bg-white"
+              : "border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white"
+          }`}
           title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
         >

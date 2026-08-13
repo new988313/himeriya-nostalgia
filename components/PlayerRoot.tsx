@@ -5,6 +5,7 @@ import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
 import { useIsDesktop } from "@/hooks/useIsDesktop";
 import { formatTime } from "@/lib/format";
 import type { Playlist } from "@/lib/youtube-types";
+import { useTheme } from "./ThemeProvider";
 import Vinyl from "./Vinyl";
 import SeekBar from "./SeekBar";
 import Transport from "./Transport";
@@ -13,18 +14,25 @@ import AudioVisualizer from "./AudioVisualizer";
 import VolumeControl from "./VolumeControl";
 import TrackDrawer from "./TrackDrawer";
 
-const GLASS =
+const GLASS_DARK =
   "border border-white/15 bg-gradient-to-b from-white/[0.18] to-white/[0.06] backdrop-blur-3xl backdrop-saturate-[1.8] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.25)]";
+
+const GLASS_LIGHT =
+  "border border-white/50 bg-white/90 backdrop-blur-3xl backdrop-saturate-[1.8] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)]";
 
 export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
   const player = useYouTubePlayer(playlists);
   const isDesktop = useIsDesktop();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   const title = player.track?.title ?? "Nothing queued";
   const artist = player.track?.artist || "Himeriya Nostalgia";
   const film = player.track?.film;
   const year = player.track?.year;
+
+  const glassStyle = isLight ? GLASS_LIGHT : GLASS_DARK;
 
   return (
     <div
@@ -44,10 +52,14 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
         <button
           type="button"
           onClick={() => setIsDrawerOpen(true)}
-          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-amber-300 backdrop-blur-md transition-all hover:border-amber-500/50 hover:bg-white/15 active:scale-95 shadow-sm shrink-0"
+          className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold backdrop-blur-md transition-all active:scale-95 shadow-md shrink-0 ${
+            isLight
+              ? "border-white/40 bg-white/90 text-neutral-900 hover:bg-white"
+              : "border-white/10 bg-white/5 text-amber-300 hover:border-amber-500/50 hover:bg-white/15"
+          }`}
           title="Browse & search 110 songs"
         >
-          <svg className="h-3.5 w-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`h-3.5 w-3.5 ${isLight ? "text-amber-800" : "text-amber-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
           </svg>
           <span className="hidden xs:inline">110 Tracks</span>
@@ -55,7 +67,7 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
       </div>
 
       {/* ---------- Desktop: Horizontal Pill ---------- */}
-      <div className={`hidden sm:flex w-full items-center gap-4 rounded-full p-3 pr-5 ${GLASS}`}>
+      <div className={`hidden sm:flex w-full items-center gap-4 rounded-full p-3 pr-5 ${glassStyle}`}>
         <Vinyl
           size={82}
           isPlaying={player.isPlaying}
@@ -66,18 +78,20 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 truncate">
-              <p className="truncate text-[15px] font-bold text-white">{title}</p>
+              <p className={`truncate text-[15px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>{title}</p>
               <AudioVisualizer isPlaying={player.isPlaying} />
             </div>
             {year && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-white/10 bg-black/40 text-white/50 shrink-0">
+              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border shrink-0 ${
+                isLight ? "border-neutral-300 bg-neutral-100 text-neutral-800 font-semibold" : "border-white/10 bg-black/40 text-white/50"
+              }`}>
                 {year}
               </span>
             )}
           </div>
 
-          <p className="truncate text-[12.5px] text-white/70">
-            {artist} {film && <span className="text-amber-400/90">• {film}</span>}
+          <p className={`truncate text-[12.5px] ${isLight ? "text-neutral-700 font-medium" : "text-white/70"}`}>
+            {artist} {film && <span className={isLight ? "text-amber-800 font-semibold" : "text-amber-400/90"}>• {film}</span>}
           </p>
 
           <SeekBar
@@ -87,13 +101,13 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
             onSeek={player.seekTo}
           />
 
-          <div className="mt-1 flex items-center justify-between text-[10.5px] tabular-nums text-white/60">
+          <div className={`mt-1 flex items-center justify-between text-[10.5px] tabular-nums ${isLight ? "text-neutral-600 font-semibold" : "text-white/60"}`}>
             <span>{formatTime(player.currentTime)}</span>
             <span>{formatTime(player.duration)}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 border-l border-white/10 pl-3">
+        <div className={`flex items-center gap-3 border-l pl-3 ${isLight ? "border-neutral-300/80" : "border-white/10"}`}>
           <VolumeControl
             volume={player.volume}
             onVolumeChange={player.changeVolume}
@@ -113,7 +127,7 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
       </div>
 
       {/* ---------- Mobile: Stacked Card ---------- */}
-      <div className={`flex w-full flex-col p-4 sm:hidden rounded-[26px] ${GLASS}`}>
+      <div className={`flex w-full flex-col p-4 sm:hidden rounded-[26px] ${glassStyle}`}>
         <div className="flex items-center gap-3">
           <Vinyl
             size={68}
@@ -123,11 +137,11 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
           />
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[15px] font-bold text-white">{title}</p>
+              <p className={`truncate text-[15px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>{title}</p>
               <AudioVisualizer isPlaying={player.isPlaying} />
             </div>
-            <p className="truncate text-[12.5px] text-white/70">
-              {artist} {film && <span className="text-amber-400/90">• {film}</span>}
+            <p className={`truncate text-[12.5px] ${isLight ? "text-neutral-700 font-medium" : "text-white/70"}`}>
+              {artist} {film && <span className={isLight ? "text-amber-800 font-semibold" : "text-amber-400/90"}>• {film}</span>}
             </p>
           </div>
         </div>
@@ -140,7 +154,7 @@ export default function PlayerRoot({ playlists }: { playlists: Playlist[] }) {
         />
 
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-[10.5px] tabular-nums text-white/60">
+          <span className={`text-[10.5px] tabular-nums ${isLight ? "text-neutral-600 font-semibold" : "text-white/60"}`}>
             {formatTime(player.currentTime)} / {formatTime(player.duration)}
           </span>
           <Transport
