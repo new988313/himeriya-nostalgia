@@ -15,11 +15,14 @@ export async function POST(req: Request) {
     const sessionId = body.sessionId || Math.random().toString(36).substring(2);
     const now = Date.now();
 
-    // Register/update current session timestamp
-    activeSessions.set(sessionId, { lastSeen: now });
+    if (body.action === "leave" && sessionId) {
+      activeSessions.delete(sessionId);
+    } else {
+      activeSessions.set(sessionId, { lastSeen: now });
+    }
 
-    // Clean up stale sessions inactive for more than 10 seconds
-    const STALE_TIMEOUT = 10000;
+    // Clean up stale sessions inactive for more than 5 seconds
+    const STALE_TIMEOUT = 5000;
     for (const [id, session] of activeSessions.entries()) {
       if (now - session.lastSeen > STALE_TIMEOUT) {
         activeSessions.delete(id);

@@ -38,10 +38,31 @@ export default function ListenerCount() {
     // Immediate initial heartbeat
     sendHeartbeat();
 
-    // Heartbeat pulse every 3 seconds for global real-time synchronization across all devices
-    const intervalId = window.setInterval(sendHeartbeat, 3000);
+    const handleLeave = () => {
+      const payload = JSON.stringify({ sessionId, action: "leave" });
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: "application/json" });
+        navigator.sendBeacon("/api/listeners", blob);
+      } else {
+        fetch("/api/listeners", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
+      }
+    };
+
+    window.addEventListener("beforeunload", handleLeave);
+    window.addEventListener("pagehide", handleLeave);
+
+    // Heartbeat pulse every 2.5 seconds for instant real-time synchronization
+    const intervalId = window.setInterval(sendHeartbeat, 2500);
 
     return () => {
+      handleLeave();
+      window.removeEventListener("beforeunload", handleLeave);
+      window.removeEventListener("pagehide", handleLeave);
       window.clearInterval(intervalId);
     };
   }, []);
