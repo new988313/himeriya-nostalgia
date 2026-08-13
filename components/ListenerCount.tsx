@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-const BASE_LISTENERS = 141;
+const BASE_LISTENERS = 0;
 
 export default function ListenerCount() {
-  const [count, setCount] = useState<number>(BASE_LISTENERS);
+  const [count, setCount] = useState<number>(1);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

@@ -7,7 +7,7 @@ type ActiveSession = {
 
 // Global map declared outside handler to persist across requests
 const activeSessions = new Map<string, ActiveSession>();
-const BASE_RADIO_LISTENERS = 140;
+const BASE_RADIO_LISTENERS = 0;
 
 export async function POST(req: Request) {
   try {
