@@ -2,70 +2,46 @@
 
 import { useEffect, useState } from "react";
 
-const CHANNEL_NAME = "himeriya_active_listeners_v1";
-const BASE_LISTENERS = 142; // Real baseline listeners count
+const BASE_LISTENERS = 141;
 
 export default function ListenerCount() {
-  const [count, setCount] = useState<number>(BASE_LISTENERS + 1);
+  const [count, setCount] = useState<number>(BASE_LISTENERS);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const tabId = Math.random().toString(36).substring(2, 9);
-    const activeTabs = new Set<string>([tabId]);
-
-    const updateUI = () => {
-      setCount(BASE_LISTENERS + activeTabs.size);
-    };
-
-    let channel: BroadcastChannel | null = null;
-
-    if ("BroadcastChannel" in window) {
-      try {
-        channel = new BroadcastChannel(CHANNEL_NAME);
-
-        channel.onmessage = (event) => {
-          const { type, id } = event.data || {};
-          if (type === "PING") {
-            if (id) activeTabs.add(id);
-            channel?.postMessage({ type: "PONG", id: tabId });
-            updateUI();
-          } else if (type === "PONG") {
-            if (id) activeTabs.add(id);
-            updateUI();
-          } else if (type === "LEAVE") {
-            if (id) activeTabs.delete(id);
-            updateUI();
-          }
-        };
-
-        // Broadcast presence when joining
-        channel.postMessage({ type: "PING", id: tabId });
-        updateUI();
-      } catch {
-        // Fallback for isolated contexts
-      }
+    // Generate unique session ID for this browser tab/device
+    let sessionId = sessionStorage.getItem("himeriya_session_id");
+    if (!sessionId) {
+      sessionId = "sess_" + Math.random().toString(36).substring(2, 11);
+      sessionStorage.setItem("himeriya_session_id", sessionId);
     }
 
-    const handleUnload = () => {
+    const sendHeartbeat = async () => {
       try {
-        channel?.postMessage({ type: "LEAVE", id: tabId });
-        channel?.close();
-      } catch {}
+        const res = await fetch("/api/listeners", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.count && typeof data.count === "number") {
+            setCount(data.count);
+          }
+        }
+      } catch {
+        // Fallback to offline estimate if network fails
+      }
     };
 
-    window.addEventListener("beforeunload", handleUnload);
+    // Immediate initial heartbeat
+    sendHeartbeat();
 
-    // Heartbeat every 4 seconds to sync active listeners
-    const intervalId = window.setInterval(() => {
-      try {
-        channel?.postMessage({ type: "PING", id: tabId });
-      } catch {}
-    }, 4000);
+    // Heartbeat pulse every 3 seconds for global real-time synchronization across all devices
+    const intervalId = window.setInterval(sendHeartbeat, 3000);
 
     return () => {
-      handleUnload();
-      window.removeEventListener("beforeunload", handleUnload);
       window.clearInterval(intervalId);
     };
   }, []);
